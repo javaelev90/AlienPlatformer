@@ -20,7 +20,6 @@ public class WorldTiles : MonoBehaviour
         get {
             return _instance;
         }
-        
     }
 
     private void Awake()
@@ -35,7 +34,6 @@ public class WorldTiles : MonoBehaviour
         }
 
         CreateWorldMap();
-        
     }
 
     private void OnDestroy()
@@ -51,51 +49,9 @@ public class WorldTiles : MonoBehaviour
         tileMapGround.CompressBounds();
         worldTiles = new Dictionary<Vector3, TileMapTile>();
         map = new TileMapTile[tileMapGround.cellBounds.size.x, tileMapGround.cellBounds.size.y];
-        foreach (Vector3Int tilePosistion in tileMapGround.cellBounds.allPositionsWithin)
-        {
-            Vector3Int localPlace = new Vector3Int(tilePosistion.x, tilePosistion.y, tilePosistion.z);
 
-            //If this position is empty we skip it
-            if (!tileMapGround.HasTile(localPlace)) continue;
-
-            TileMapTile worldTile = new TileMapTile
-            {
-                localPlace = localPlace,
-                worldLocation = tileMapGround.CellToWorld(localPlace),
-                tileBase = tileMapGround.GetTile(localPlace),
-                parentTileMap = tileMapGround,
-                miniMapObject = new MiniMapObject {
-                    visibleOnMinimap = false,
-                    paintedOnMinimap = false,
-                    objectName = "tile"
-                }
-            };
-            worldTiles.Add(worldTile.worldLocation, worldTile);
-
-        }
-
-        foreach (Vector3Int tilePosistion in tileMapHazards.cellBounds.allPositionsWithin)
-        {
-            Vector3Int localPlace = new Vector3Int(tilePosistion.x, tilePosistion.y, tilePosistion.z);
-
-            //If this position is empty we skip it
-            if (!tileMapHazards.HasTile(localPlace)) continue;
-
-            TileMapTile worldTile = new TileMapTile
-            {
-                localPlace = localPlace,
-                worldLocation = tileMapHazards.CellToWorld(localPlace),
-                tileBase = tileMapHazards.GetTile(localPlace),
-                parentTileMap = tileMapHazards,
-                miniMapObject = new MiniMapObject {
-                    visibleOnMinimap = false,
-                    paintedOnMinimap = false,
-                    objectName = "hazard"
-                }
-            };
-            worldTiles.Add(worldTile.worldLocation, worldTile);
-
-        }
+        loadTiles(tileMapGround, "tile");
+        loadTiles(tileMapHazards, "hazard");
 
         GameObject[] enemyArray = GameObject.FindGameObjectsWithTag("Enemy");
         enemies = new ConcurrentDictionary<int, GameObject>();
@@ -103,30 +59,31 @@ public class WorldTiles : MonoBehaviour
         {
             enemies.TryAdd(enemy.GetInstanceID(), enemy);
         }
-        //for (int x = tileMap.origin.x, i = 0; i < (tileMap.size.x); x++, i++)
-        //{
-        //    for (int y = tileMap.origin.y, j = 0; j < (tileMap.size.y); y++, j++)
-        //    {
-        //        Vector3Int tilePosition = new Vector3Int(x, y, 0);
+    }
 
-        //        if (!tileMap.HasTile(tilePosition)) continue;
+    private void loadTiles(Tilemap tileMap, string tileName)
+    {
+        foreach (Vector3Int tilePosistion in tileMap.cellBounds.allPositionsWithin)
+        {
+            Vector3Int localPlace = new Vector3Int(tilePosistion.x, tilePosistion.y, tilePosistion.z);
 
-        //        var worldTile = new TileMapTile
-        //        {
-        //            localPlace = tilePosition,
-        //            worldLocation = tileMap.CellToWorld(tilePosition),
-        //            tileBase = tileMap.GetTile(tilePosition),
-        //            parentTileMap = tileMap,
-        //            visibleOnMinimap = false,
-        //            paintedOnMinimap = false,
-        //            name = "tile"
-        //        };
+            //If this position is empty we skip it
+            if (!tileMap.HasTile(localPlace)) continue;
 
-        //        map[i, j] = worldTile;
-
-        //    }
-
-        //}
-
+            TileMapTile worldTile = new TileMapTile
+            {
+                localPlace = localPlace,
+                worldLocation = tileMap.CellToWorld(localPlace),
+                tileBase = tileMap.GetTile(localPlace),
+                parentTileMap = tileMap,
+                miniMapObject = new MiniMapObject
+                {
+                    visibleOnMinimap = false,
+                    paintedOnMinimap = false,
+                    objectName = tileName
+                }
+            };
+            worldTiles.Add(worldTile.worldLocation, worldTile);
+        }
     }
 }

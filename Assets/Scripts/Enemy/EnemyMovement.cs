@@ -240,13 +240,11 @@ public class EnemyMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-
             if(attackTimer > stats.attackDelay)
             {
                 animator.SetBool("isAttacking", true);
                 collision.gameObject.GetComponent<PlayerStats>().takeDamage(stats.attackDamage);
                 attackTimer = 0f;
-
             }
         }
     }
